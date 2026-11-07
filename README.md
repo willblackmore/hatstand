@@ -4,6 +4,17 @@ A small macOS menu bar app for switching the Claude desktop app between separate
 
 > Hatstand is an unofficial, independent project. It isn't made by or affiliated with Anthropic.
 
+## Install
+
+1. Download **[Hatstand.dmg](https://github.com/willblackmore/hatstand/releases/latest/download/Hatstand.dmg)** from the [latest release](https://github.com/willblackmore/hatstand/releases/latest).
+2. Open it and drag **Hatstand** into **Applications**.
+3. Open Hatstand from Applications. The first time, macOS will say it can't check the app for malicious software. Click **Done**.
+4. Open **System Settings › Privacy & Security**, scroll down to the message about Hatstand and click **Open Anyway**. Confirm with your password or Touch ID.
+
+You only need to do steps 3 and 4 once. macOS asks because Hatstand isn't signed with an Apple Developer ID or notarised. If you'd rather not trust a downloaded build, [build it yourself](#building).
+
+Hatstand needs macOS 14 Sonoma or later, on Apple silicon or Intel.
+
 ## What it does
 
 - Shows the running instance's name in the menu bar.
@@ -51,7 +62,15 @@ Run the unit tests with:
 xcodebuild -project Hatstand.xcodeproj -scheme Hatstand -derivedDataPath build test
 ```
 
-The app is signed to run locally only. It isn't signed with a Developer ID or notarised, so you need to build it yourself.
+To make the downloadable disk image, run:
+
+```bash
+scripts/make-release.sh
+```
+
+It builds a universal Release copy and saves it as `dist/Hatstand.dmg`. Upload that file to a GitHub release tagged with the version number, for example `v1.0`. Keep the file name as `Hatstand.dmg` so the download link always gets the latest version.
+
+The app is signed to run locally only (ad hoc). It isn't signed with a Developer ID or notarised.
 
 If you'd like to use your own bundle identifier, change `PRODUCT_BUNDLE_IDENTIFIER` in the project's build settings.
 
