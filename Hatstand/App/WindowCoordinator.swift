@@ -9,11 +9,13 @@ final class WindowCoordinator {
     private let store: InstanceStore
     private let controller: ClaudeController
     private var manageWindow: NSWindow?
+    private let updates: UpdateChecker
     private var settingsWindow: NSWindow?
 
-    init(store: InstanceStore, controller: ClaudeController) {
+    init(store: InstanceStore, controller: ClaudeController, updates: UpdateChecker) {
         self.store = store
         self.controller = controller
+        self.updates = updates
     }
 
     func showManageWindow() {
@@ -43,6 +45,7 @@ final class WindowCoordinator {
             let view = SettingsView()
                 .environmentObject(store)
                 .environmentObject(controller)
+                .environmentObject(updates)
             let window = makeWindow(
                 title: "Hatstand Settings",
                 rootView: view,

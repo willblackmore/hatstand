@@ -8,14 +8,16 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
     private let store: InstanceStore
     private let controller: ClaudeController
     private let windows: WindowCoordinator
+    private let updates: UpdateChecker
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let menu = NSMenu()
     private var cancellables: Set<AnyCancellable> = []
 
-    init(store: InstanceStore, controller: ClaudeController, windows: WindowCoordinator) {
+    init(store: InstanceStore, controller: ClaudeController, windows: WindowCoordinator, updates: UpdateChecker) {
         self.store = store
         self.controller = controller
         self.windows = windows
+        self.updates = updates
         super.init()
 
         statusItem.autosaveName = "HatstandStatusItem"
@@ -115,6 +117,16 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
 
         menu.addItem(.separator())
 
+        if let update = updates.availableUpdate {
+            let version = update.version?.description ?? update.tagName
+            let item = NSMenuItem(title: "Update Available: Hatstand \(version)…",
+                                  action: #selector(showUpdate), keyEquivalent: "")
+            item.target = self
+            item.image = NSImage(systemSymbolName: "arrow.down.circle", accessibilityDescription: nil)
+            menu.addItem(item)
+            menu.addItem(.separator())
+        }
+
         let manage = NSMenuItem(title: "Manage Instances…", action: #selector(manageInstances), keyEquivalent: "")
         manage.target = self
         manage.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)
@@ -123,6 +135,11 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
         let settings = NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
         settings.target = self
         menu.addItem(settings)
+
+        let check = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdates), keyEquivalent: "")
+        check.target = self
+        check.isEnabled = !updates.isChecking
+        menu.addItem(check)
 
         menu.addItem(.separator())
 
@@ -145,6 +162,15 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
 
     @objc private func openSettings() {
         windows.showSettingsWindow()
+    }
+
+    @objc private func showUpdate() {
+        guard let update = updates.availableUpdate else { return }
+        updates.presentUpdate(update)
+    }
+
+    @objc private func checkForUpdates() {
+        updates.checkAndReport()
     }
 
     @objc private func locateClaude() {

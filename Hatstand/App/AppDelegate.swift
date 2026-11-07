@@ -21,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var controller: ClaudeController?
     private var windows: WindowCoordinator?
     private var statusMenu: StatusMenuController?
+    private var updates: UpdateChecker?
 
     /// Unit tests are hosted in the app; don't put up a menu bar item for them.
     private var isRunningTests: Bool {
@@ -36,11 +37,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         InstanceStore.copyLegacyConfigIfNeeded()
         let store = InstanceStore()
         let controller = ClaudeController(store: store)
-        let windows = WindowCoordinator(store: store, controller: controller)
+        let updates = UpdateChecker(store: store)
+        let windows = WindowCoordinator(store: store, controller: controller, updates: updates)
         self.store = store
         self.controller = controller
+        self.updates = updates
         self.windows = windows
-        self.statusMenu = StatusMenuController(store: store, controller: controller, windows: windows)
+        self.statusMenu = StatusMenuController(store: store, controller: controller, windows: windows, updates: updates)
+        updates.start()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

@@ -4,6 +4,7 @@ import ServiceManagement
 struct SettingsView: View {
     @EnvironmentObject private var store: InstanceStore
     @EnvironmentObject private var controller: ClaudeController
+    @EnvironmentObject private var updates: UpdateChecker
 
     @State private var loginItemStatus = SMAppService.mainApp.status
     @State private var loginItemError: String?
@@ -32,6 +33,24 @@ struct SettingsView: View {
                 Toggle(isOn: confirmBinding) {
                     Text("Confirm before switching")
                     Text("Ask before quitting Claude to open another instance.")
+                }
+            }
+
+            Section("Updates") {
+                Toggle(isOn: checkForUpdatesBinding) {
+                    Text("Check for updates automatically")
+                    Text("Once a day, Hatstand asks GitHub whether there’s a newer version. It never downloads anything without asking.")
+                }
+                LabeledContent {
+                    Button("Check Now") { updates.checkAndReport() }
+                        .disabled(updates.isChecking)
+                } label: {
+                    if let update = updates.availableUpdate {
+                        Text("Hatstand \(updates.currentVersion.description)")
+                        Text("Version \(update.version?.description ?? update.tagName) is available.")
+                    } else {
+                        Text("Hatstand \(updates.currentVersion.description)")
+                    }
                 }
             }
 
@@ -82,6 +101,13 @@ struct SettingsView: View {
                 }
                 loginItemStatus = SMAppService.mainApp.status
             }
+        )
+    }
+
+    private var checkForUpdatesBinding: Binding<Bool> {
+        Binding(
+            get: { store.settings.checkForUpdates },
+            set: { value in store.updateSettings { $0.checkForUpdates = value } }
         )
     }
 

@@ -21,6 +21,7 @@ Hatstand needs macOS 14 Sonoma or later, on Apple silicon or Intel.
 - Lists your instances in a menu. Click one to switch: Hatstand quits Claude fully, then reopens it as that instance.
 - **Manage Instances** window to add, rename and remove instances and see where their data lives.
 - Settings: open at login, confirm before switching, and where to find Claude.
+- Tells you when a new version is out. Once a day it asks GitHub whether there’s a newer release; you can turn this off in Settings. It never downloads anything without asking.
 
 ## How it works
 
@@ -68,7 +69,7 @@ To make the downloadable disk image, run:
 scripts/make-release.sh
 ```
 
-It builds a universal Release copy and saves it as `dist/Hatstand.dmg`. Upload that file to a GitHub release tagged with the version number, for example `v1.0`. Keep the file name as `Hatstand.dmg` so the download link always gets the latest version.
+It builds a universal Release copy and saves it as `dist/Hatstand.dmg`. Upload that file to a GitHub release tagged with the version number, for example `v1.0`. Set the version (`MARKETING_VERSION`) in Xcode first: the tag must match it, because that's how Hatstand's update check spots a new release. Keep the file name as `Hatstand.dmg` so the download link always gets the latest version.
 
 The app is signed to run locally only (ad hoc). It isn't signed with a Developer ID or notarised.
 

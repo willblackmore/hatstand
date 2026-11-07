@@ -33,6 +33,8 @@ struct Instance: Codable, Identifiable, Hashable {
 struct AppSettings: Codable, Equatable {
     var confirmBeforeSwitching: Bool = true
     var claudeAppPath: String = "/Applications/Claude.app"
+    /// Ask GitHub once a day whether there's a newer release.
+    var checkForUpdates: Bool = true
 
     init() {}
 
@@ -43,6 +45,8 @@ struct AppSettings: Codable, Equatable {
             ?? defaults.confirmBeforeSwitching
         claudeAppPath = try c.decodeIfPresent(String.self, forKey: .claudeAppPath)
             ?? defaults.claudeAppPath
+        checkForUpdates = try c.decodeIfPresent(Bool.self, forKey: .checkForUpdates)
+            ?? defaults.checkForUpdates
     }
 }
 

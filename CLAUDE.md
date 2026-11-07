@@ -111,6 +111,13 @@ Write atomically. Standardise all paths (resolve `~`, symlinks, trailing slashes
 4. Launch the chosen instance.
 5. Show progress while switching (e.g. "Switching…" in the menu bar title) and ignore further clicks until done.
 
+### Update check
+
+- `UpdateChecker` asks GitHub's API for the latest release (`repos/willblackmore/hatstand/releases/latest`) about 10 seconds after launch and then once a day, if "Check for updates automatically" is on (default: on).
+- It compares the release tag (`v1.1`) with `CFBundleShortVersionString` numerically. If newer, the menu shows "Update Available: Hatstand 1.1…", which offers to open the release page.
+- It never downloads or installs anything itself. "Check for Updates…" in the menu and **Check Now** in Settings check straight away and always report the result.
+- Release tags must match the app's version (`MARKETING_VERSION`), with a leading `v`.
+
 ---
 
 ## UI
@@ -132,7 +139,12 @@ YOUR INSTANCES              ← section header (NSMenuItem.sectionHeader)
   Personal
   Another one
 ─────────────
-⚙ Manage instances…
+⬇ Update Available: Hatstand 1.1…   ← only when there's a newer release
+─────────────
+⚙ Manage Instances…
+  Settings…
+  Check for Updates…
+─────────────
   Quit Hatstand
 ```
 
@@ -164,6 +176,7 @@ Either a tab in the Manage window or a standard Settings window:
 
 - Open Hatstand at login (`SMAppService.mainApp`)
 - Confirm before switching (default: on)
+- Check for updates automatically (default: on), with **Check Now**
 - Claude app location (path + **Choose…**)
 
 ---
@@ -200,7 +213,7 @@ An angular top hat (orange `#D97757`, cream band `#FAF9F5`, on `#131313`): `desi
 - Terminal `claude` CLI aliases or setup.
 - Per-instance Dock icons, or any change to Claude.app.
 - Watching for Claude opened directly and relaunching it as another instance.
-- Developer ID signing, notarisation, auto-updates.
+- Developer ID signing, notarisation, automatic installation of updates (Sparkle). Hatstand only tells people about updates.
 
 ---
 
