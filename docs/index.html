@@ -51,6 +51,8 @@
   h1, h2, h3 { font-family: var(--serif); font-weight: 500; color: var(--cream); margin: 0; }
   p { margin: 0; }
   .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+  /* Roomier gutters on mid-size screens; content stays 952px wide at most */
+  .install .wrap, .why .wrap { --gutter: clamp(24px, 6vw, 64px); max-width: calc(952px + 2 * var(--gutter)); padding: 0 var(--gutter); }
 
   /* Header */
   .hero { display: flex; justify-content: center; padding: 80px 24px; overflow: hidden; }
@@ -176,13 +178,22 @@
 
   /* Questions */
   .faq { padding: 54px 0; }
-  .faq h2 { font-size: 32px; line-height: 1.25; margin-bottom: 32px; }
-  .faq-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 64px; margin: 0; }
-  .faq-list dt { font-weight: 590; font-size: 17px; color: var(--cream); margin-bottom: 8px; }
-  .faq-list dd { margin: 0; color: var(--muted); }
-  .faq-list dd p + p { margin-top: 8px; }
-  .faq-list code { font: 300 14px var(--mono); }
-  @media (max-width: 760px) { .faq-list { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+  .faq .wrap { max-width: 768px; }
+  .faq h2 { font-size: 32px; line-height: 1.25; margin-bottom: 16px; }
+  .faq details { border-bottom: 1px solid rgba(250, 249, 245, 0.1); }
+  .faq summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    padding: 18px 0; cursor: pointer; list-style: none;
+    font-weight: 590; font-size: 17px; color: var(--cream);
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary:focus-visible { outline: 2px solid var(--orange); outline-offset: 4px; }
+  .faq .arrow { flex: none; width: 16px; height: auto; transition: transform 0.2s ease; }
+  .faq details[open] .arrow { transform: scaleY(-1); }
+  .faq .answer { padding: 0 40px 20px 0; color: var(--muted); }
+  .faq .answer p + p { margin-top: 12px; }
+  .faq code { font: 300 14px var(--mono); }
+  @media (prefers-reduced-motion: reduce) { .faq .arrow { transition: none; } }
 
   /* Footer */
   footer { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 16px 32px; padding: 64px 24px 40px; color: var(--text); }
@@ -207,6 +218,7 @@
     .details { align-items: center; }
     h1 { font-size: 40px; }
     .wrap { padding: 0 16px; }
+    .install .wrap, .why .wrap { --gutter: 16px; }
     .card { padding: 24px; }
     .why-copy > .panel { left: -16px; top: -40px; width: calc(100% + 32px); height: calc(100% + 80px); }
     .menubar { right: 10px; }
@@ -251,58 +263,66 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "How do I run multiple Claude accounts on one Mac?",
+        "name": "Why does this exist?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "The Claude desktop app is signed in to one account at a time, so switching normally means signing out and back in. Hatstand gives each account its own instance with its own data folder. Pick one from the menu bar and Claude quits and reopens as that account, already signed in. If you only need chat, you can also use claude.ai in a separate browser profile for each account."
+          "text": "I use Claude for work and in my personal life. Logging out and back in every time (especially with SSO or Google sign-in) got old fast. There were already ways to run multiple instances, but they all involved the Terminal. I wanted something anyone could use. I also wanted to see if I could build it with Claude. If I’m honest, this page took more effort than the app itself."
         }
       },
       {
         "@type": "Question",
-        "name": "Can I keep separate work and personal Claude accounts?",
+        "name": "How do I use multiple Claude accounts on one Mac?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, that’s what Hatstand is for. Each instance keeps its own sign-in, chats, settings, MCP servers and Cowork files, so nothing crosses over between work and personal."
+          "text": "Hatstand gives each account its own Claude instance. Sign in once to each account, then switch between them from the menu bar. No signing out and back in. Just bear in mind that if you open Claude from Spotlight, the Dock, or after an update, it’ll always open your default profile."
         }
       },
       {
         "@type": "Question",
-        "name": "Can I switch Claude accounts without signing out?",
+        "name": "Can I keep my work and personal accounts separate?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes. You sign in once in each instance. After that, switching is one click in the menu bar: Hatstand quits Claude fully and reopens it as the other account a few seconds later."
+          "text": "Yeah. Each instance has its own sign-in, chats, settings, MCP servers and Cowork files."
         }
       },
       {
         "@type": "Question",
-        "name": "Does each account get its own Claude Code login?",
+        "name": "Can I switch accounts without signing out?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes. Each instance has its own Claude Code folder for the Code tab in the desktop app, with its own settings, sessions and sign-in. The claude command in Terminal still uses its usual setup."
+          "text": "Yes. Just pick an account from the menu bar. Claude closes and reopens as that account a few seconds later. The first time you use a new instance you’ll need to sign in, but that’s a one-off."
         }
       },
       {
         "@type": "Question",
-        "name": "Can I use two Claude accounts at the same time?",
+        "name": "Does each account have its own Claude Code login?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Not with Hatstand. Only one instance runs at a time, and switching quits Claude before reopening it, so finish anything in progress first."
+          "text": "Yes. Every instance has its own Claude Code settings, sessions and sign-in. The claude Terminal command isn’t affected."
         }
       },
       {
         "@type": "Question",
-        "name": "Why does Claude open as my default account after an update?",
+        "name": "Can I run two Claude accounts at the same time?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "When Claude updates itself, it restarts without Hatstand’s launch settings, so it comes back as your default account. Switch back from the menu bar. Opening Claude from the Dock or Spotlight also always opens the default account."
+          "text": "No. Hatstand only runs one Claude instance at a time. Switching closes the current one before opening the next."
         }
       },
       {
         "@type": "Question",
-        "name": "Is Hatstand official? Is it safe?",
+        "name": "Why did Claude switch back to my default account after updating?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "It’s an unofficial, independent project, not made by or affiliated with Anthropic. It never modifies Claude or moves its data: it only launches Claude with a separate data folder for each account, and quits it when you switch. The code is open source, so you can read it or build it yourself. Because it relies on how Claude launches today, a future Claude update could change how it works."
+          "text": "Claude restarts itself after an update and bypasses Hatstand, so it opens your default account. You can switch back from the menu bar. The same happens if you launch Claude from the Dock or Spotlight."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Hatstand official?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Nope! It’s an independent open source project and isn’t affiliated with Anthropic."
         }
       },
       {
@@ -310,7 +330,7 @@
         "name": "Does Hatstand collect any data?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No. Its only network request is a daily check with GitHub for a newer version, which you can turn off in Settings."
+          "text": "No. The only network request is an optional daily GitHub update check, which you can turn off in Settings."
         }
       }
     ]
@@ -350,7 +370,7 @@
       <h2>Installation</h2>
       <div class="cols">
         <div>
-          <p class="lede">Until I’m enrolled in the Apple developer programme, this requires a bit of manual effort…</p>
+          <p class="lede">Hatstand isn’t code signed, so there’s a quick one-time setup before you can use it. After that, it works normally.</p>
           <ol class="steps">
             <li><p>Download <a href="https://github.com/willblackmore/hatstand/releases/latest/download/Hatstand.dmg">Hatstand.dmg</a>, open it and drag Hatstand into Applications.</p></li>
             <li><p>Open Hatstand. The first time, macOS says it can’t check the app for malicious software. Click Done.</p></li>
@@ -432,42 +452,65 @@ Then help me download the code, build it and get Hatstand running in my menu bar
   <section class="faq">
     <div class="wrap">
       <h2>Questions</h2>
-      <dl class="faq-list">
-        <div>
-          <dt>How do I run multiple Claude accounts on one Mac?</dt>
-          <dd><p>The Claude desktop app is signed in to one account at a time, so switching normally means signing out and back in. Hatstand gives each account its own instance with its own data folder. Pick one from the menu bar and Claude quits and reopens as that account, already signed in.</p>
-          <p>If you only need chat, you can also use claude.ai in a separate browser profile for each account.</p></dd>
-        </div>
-        <div>
-          <dt>Can I keep separate work and personal Claude accounts?</dt>
-          <dd><p>Yes, that’s what Hatstand is for. Each instance keeps its own sign-in, chats, settings, MCP servers and Cowork files, so nothing crosses over between work and personal.</p></dd>
-        </div>
-        <div>
-          <dt>Can I switch Claude accounts without signing out?</dt>
-          <dd><p>Yes. You sign in once in each instance. After that, switching is one click in the menu bar: Hatstand quits Claude fully and reopens it as the other account a few seconds later.</p></dd>
-        </div>
-        <div>
-          <dt>Does each account get its own Claude Code login?</dt>
-          <dd><p>Yes. Each instance has its own Claude Code folder for the Code tab in the desktop app, with its own settings, sessions and sign-in. The <code>claude</code> command in Terminal still uses its usual setup.</p></dd>
-        </div>
-        <div>
-          <dt>Can I use two Claude accounts at the same time?</dt>
-          <dd><p>Not with Hatstand. Only one instance runs at a time, and switching quits Claude before reopening it, so finish anything in progress first.</p></dd>
-        </div>
-        <div>
-          <dt>Why does Claude open as my default account after an update?</dt>
-          <dd><p>When Claude updates itself, it restarts without Hatstand’s launch settings, so it comes back as your default account. Switch back from the menu bar. Opening Claude from the Dock or Spotlight also always opens the default account.</p></dd>
-        </div>
-        <div>
-          <dt>Is Hatstand official? Is it safe?</dt>
-          <dd><p>It’s an unofficial, independent project, not made by or affiliated with Anthropic. It never modifies Claude or moves its data: it only launches Claude with a separate data folder for each account, and quits it when you switch. The code is open source, so you can read it or build it yourself.</p>
-          <p>Because it relies on how Claude launches today, a future Claude update could change how it works.</p></dd>
-        </div>
-        <div>
-          <dt>Does Hatstand collect any data?</dt>
-          <dd><p>No. Its only network request is a daily check with GitHub for a newer version, which you can turn off in Settings.</p></dd>
-        </div>
-      </dl>
+      <div class="faq-list">
+        <details>
+          <summary>Why does this exist?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>I use Claude for work and in my personal life. Logging out and back in every time (especially with SSO or Google sign-in) got old fast.</p>
+            <p>There were already ways to run multiple instances, but they all involved the Terminal. I wanted something anyone could use.</p>
+            <p>I also wanted to see if I could build it with Claude. If I’m honest, this page took more effort than the app itself.</p>
+          </div>
+        </details>
+        <details>
+          <summary>How do I use multiple Claude accounts on one Mac?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>Hatstand gives each account its own Claude instance. Sign in once to each account, then switch between them from the menu bar. No signing out and back in.</p>
+            <p>Just bear in mind that if you open Claude from Spotlight, the Dock, or after an update, it’ll always open your default profile.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Can I keep my work and personal accounts separate?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>Yeah. Each instance has its own sign-in, chats, settings, MCP servers and Cowork files.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Can I switch accounts without signing out?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>Yes. Just pick an account from the menu bar. Claude closes and reopens as that account a few seconds later. The first time you use a new instance you’ll need to sign in, but that’s a one-off.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Does each account have its own Claude Code login?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>Yes. Every instance has its own Claude Code settings, sessions and sign-in. The <code>claude</code> Terminal command isn’t affected.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Can I run two Claude accounts at the same time?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>No. Hatstand only runs one Claude instance at a time. Switching closes the current one before opening the next.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Why did Claude switch back to my default account after updating?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>Claude restarts itself after an update and bypasses Hatstand, so it opens your default account. You can switch back from the menu bar. The same happens if you launch Claude from the Dock or Spotlight.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Is Hatstand official?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>Nope! It’s an independent open source project and isn’t affiliated with Anthropic.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Does Hatstand collect any data?<img class="arrow" src="images/arrow.svg" alt=""></summary>
+          <div class="answer">
+            <p>No. The only network request is an optional daily GitHub update check, which you can turn off in Settings.</p>
+          </div>
+        </details>
+      </div>
     </div>
   </section>
 </main>
