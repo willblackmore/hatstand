@@ -62,6 +62,8 @@
   }
   .download:hover { background: #e2896b; color: #131313; }
   .download img { width: 22px; height: 22px; }
+  .download .label { display: flex; flex-direction: column; line-height: 1.3; }
+  .download .version { font-weight: 400; font-size: 13px; opacity: 0.8; }
   .details { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--faint); }
   .details li { display: flex; align-items: center; gap: 10px; }
   .details img { width: 18px; height: 18px; }
@@ -206,7 +208,10 @@
         <p class="tagline">Switch the Claude desktop app between accounts from your menu bar, without the faff.</p>
       </div>
       <a class="download" href="https://github.com/willblackmore/hatstand/releases/latest/download/Hatstand.dmg">
-        Download for macOS
+        <span class="label">
+          Download for macOS
+          <span class="version">Version <span id="version">1.1</span></span>
+        </span>
         <img src="images/download.svg" alt="">
       </a>
       <ul class="details">
@@ -314,6 +319,15 @@ Then help me download the code, build it and get Hatstand running in my menu bar
 <p class="disclaimer">Hatstand is an unofficial, independent project. It isn’t made by or affiliated with Anthropic. Released under the <a href="https://github.com/willblackmore/hatstand/blob/main/LICENSE">MIT licence</a>.</p>
 
 <script>
+  // Show the latest release's version on the download button (the HTML holds a fallback)
+  fetch('https://api.github.com/repos/willblackmore/hatstand/releases/latest')
+    .then((response) => response.ok ? response.json() : null)
+    .then((release) => {
+      const version = release?.tag_name?.replace(/^v/, '');
+      if (version && /^\d+(\.\d+)*$/.test(version)) document.getElementById('version').textContent = version;
+    })
+    .catch(() => {});
+
   // Copy the build prompt
   (() => {
     const button = document.querySelector('.prompt');

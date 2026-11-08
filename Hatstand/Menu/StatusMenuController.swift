@@ -129,7 +129,7 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
 
         let manage = NSMenuItem(title: "Manage Instances…", action: #selector(manageInstances), keyEquivalent: "")
         manage.target = self
-        manage.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)
+        manage.image = NSImage(systemSymbolName: "square.grid.2x2.fill", accessibilityDescription: nil)
         menu.addItem(manage)
 
         let settings = NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
