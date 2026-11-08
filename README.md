@@ -1,6 +1,8 @@
 # Hatstand
 
-A small macOS menu bar app for switching the Claude desktop app between separate **instances**, such as Work and Personal. Each instance has its own sign-in, chats, settings, MCP servers and Claude Code data. Only one instance runs at a time.
+Run multiple Claude accounts on one Mac. Hatstand is a small macOS menu bar app that switches the Claude desktop app between separate **instances**, such as Work and Personal, without signing out and back in. Each instance has its own sign-in, chats, settings, MCP servers and Claude Code data. Only one instance runs at a time.
+
+**Website:** [willblackmore.github.io/hatstand](https://willblackmore.github.io/hatstand/)
 
 > Hatstand is an unofficial, independent project. It isn't made by or affiliated with Anthropic.
 
