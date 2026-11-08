@@ -5,198 +5,438 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hatstand</title>
 <meta name="description" content="A macOS menu bar app for switching the Claude desktop app between accounts, each with its own chats, settings and Claude Code data.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#131313">
 <meta property="og:title" content="Hatstand">
-<meta property="og:description" content="Switch the Claude desktop app between accounts from the macOS menu bar, without signing out and back in.">
+<meta property="og:description" content="Switch the Claude desktop app between accounts from your menu bar, without the faff.">
 <meta property="og:image" content="https://willblackmore.github.io/hatstand/icon.svg">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Libre+Baskerville:wght@500&display=swap">
 <style>
   :root {
-    --bg: #faf9f5;
-    --fg: #1d1c1a;
-    --muted: #6b6862;
-    --line: #e4e1d8;
-    --card: #ffffff;
-    --accent: #d97757;
-    --accent-fg: #ffffff;
-    --menu-bg: rgba(246, 245, 243, 0.92);
-    --menu-fg: #1d1d1f;
-    --menu-muted: #8a8a8e;
-    --menu-line: rgba(0, 0, 0, 0.1);
-    --bar-bg: #e9e7e2;
-    --bar-fg: #1d1d1f;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #141413;
-      --fg: #f2f0ea;
-      --muted: #a29f97;
-      --line: #2c2b28;
-      --card: #1c1b19;
-      --menu-bg: rgba(40, 40, 42, 0.94);
-      --menu-fg: #f5f5f7;
-      --menu-muted: #98989d;
-      --menu-line: rgba(255, 255, 255, 0.12);
-      --bar-bg: #232321;
-      --bar-fg: #f5f5f7;
-    }
+    --bg: #131313;
+    --panel: #1f1e1d;
+    --cream: #faf9f5;
+    --text: #c1bfb5;
+    --muted: #b0afaa;
+    --faint: #9f9f9f;
+    --orange: #d97757;
+    --card-text: #545352;
+    --serif: "Libre Baskerville", Baskerville, Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --mono: "DM Mono", ui-monospace, Menlo, monospace;
   }
   * { box-sizing: border-box; }
+  html { background: var(--bg); }
   body {
     margin: 0;
     background: var(--bg);
-    color: var(--fg);
-    font: 17px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    color: var(--text);
+    font: 300 16px/1.5 var(--sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
-  a { color: inherit; }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+  a { color: inherit; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+  a:hover { color: var(--cream); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 500; color: var(--cream); margin: 0; }
+  p { margin: 0; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
 
-  header { padding: 72px 0 40px; text-align: center; }
-  header img { width: 148px; height: 148px; filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.22)); }
-  @media (prefers-color-scheme: dark) {
-    header img { filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.35)) drop-shadow(0 10px 28px rgba(0, 0, 0, 0.6)); }
-  }
-  h1 { font-size: 52px; letter-spacing: -0.02em; margin: 8px 0 6px; }
-  .tagline { font-size: 21px; color: var(--muted); max-width: 560px; margin: 0 auto 28px; }
+  /* Header */
+  .hero { display: flex; justify-content: center; padding: 80px 24px; overflow: hidden; }
+  .hero-inner { display: flex; align-items: center; gap: 88px; }
+  .art { position: relative; flex: none; width: 198px; aspect-ratio: 198.392 / 517.722; }
+  .art img { position: absolute; left: -67.19%; top: 0; width: 498%; height: auto; max-width: none; }
+  .intro { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 32px; max-width: 416px; }
+  .intro .copy { display: flex; flex-direction: column; gap: 16px; }
+  h1 { font-size: 48px; line-height: 1.25; }
+  .tagline { font-size: 18px; color: var(--muted); opacity: 0.8; }
   .download {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: var(--accent); color: var(--accent-fg); text-decoration: none;
-    font-weight: 600; font-size: 18px; padding: 14px 26px; border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(217, 119, 87, 0.3);
+    display: inline-flex; align-items: center; gap: 16px;
+    padding: 8px 12px 8px 16px;
+    background: var(--orange); color: #131313;
+    font-weight: 590; font-size: 16px; text-decoration: none;
+    transition: background-color 0.15s;
   }
-  .download:hover { filter: brightness(1.05); }
-  .download svg { width: 18px; height: 18px; }
-  .meta { color: var(--muted); font-size: 14px; margin-top: 12px; }
-  .meta a { color: var(--muted); }
+  .download:hover { background: #e2896b; color: #131313; }
+  .download img { width: 22px; height: 22px; }
+  .details { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--faint); }
+  .details li { display: flex; align-items: center; gap: 10px; }
+  .details img { width: 18px; height: 18px; }
 
-  /* Drawn menu, standing in for a screenshot */
-  .demo { display: flex; justify-content: center; margin: 24px 0 64px; }
-  .screen {
-    width: 100%; max-width: 520px; border-radius: 14px; overflow: hidden;
-    border: 1px solid var(--line); background: linear-gradient(160deg, #e3a58b, #b85c3e 55%, #5b3326);
-    padding-bottom: 28px;
+  /* Installation */
+  .install { padding: 54px 0; }
+  .install h2 { font-size: 32px; margin-bottom: 16px; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) 437px; gap: 64px; align-items: start; }
+  .lede { font-style: italic; color: var(--muted); margin-bottom: 16px; }
+  .steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  .steps li { display: flex; gap: 16px; align-items: flex-start; counter-increment: step; }
+  .steps li::before {
+    content: counter(step);
+    flex: none; width: 38px; text-align: center;
+    font: 700 48px/1.5 var(--sans); color: var(--orange); opacity: 0.8;
   }
-  .bar {
-    display: flex; justify-content: flex-end; align-items: center; gap: 18px;
-    height: 30px; padding: 0 16px; background: var(--bar-bg); color: var(--bar-fg);
-    font-size: 13.5px;
+  .steps p { padding: 10px 0; color: var(--muted); }
+  .steps a { color: var(--cream); }
+
+  .card { background: var(--cream); color: var(--card-text); padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .card h3 { color: #131313; opacity: 0.8; font-size: 24px; line-height: 1.25; }
+  .card a:hover { color: #131313; }
+  .prompt {
+    display: flex; align-items: center; gap: 9px; width: 100%;
+    background: #000; border: 0; border-radius: 24px; padding: 7px 8px 7px 12px;
+    text-align: left; cursor: pointer; transition: background-color 0.15s;
   }
-  .bar .item { display: flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 5px; }
-  .bar .item.open { background: rgba(127, 127, 127, 0.25); }
-  .bar svg { width: 17px; height: 11px; }
+  .prompt:hover { background: #222; }
+  .prompt:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .copied-note { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .prompt .icon { flex: none; width: 18px; height: 18px; color: var(--orange); }
+  .prompt code {
+    flex: 1; min-width: 0;
+    font: 300 16px/1.5 var(--mono); color: var(--cream); opacity: 0.5;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .copy-icon { flex: none; display: grid; place-items: center; width: 24px; height: 24px; }
+  .copy-icon img { width: 12.4px; height: 15.2px; }
+  .copy-icon .tick { display: none; width: 14px; height: 14px; }
+  .prompt.done .copy-icon img { display: none; }
+  .prompt.done .copy-icon .tick { display: block; }
+
+  /* Why */
+  .why { padding: 54px 0; }
+  .why .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 437px; gap: 64px; align-items: center; }
+  .why-copy { position: relative; display: flex; flex-direction: column; gap: 16px; }
+  .why { overflow-x: clip; }
+  .why-copy > .panel { position: absolute; top: -57px; left: -64px; width: calc(100% + 262px); height: calc(100% + 114px); max-width: none; z-index: -1; }
+  .why-copy { z-index: 0; isolation: isolate; }
+  .why h2 { font-size: 32px; line-height: 1.25; }
+  .why-copy p + p { margin-top: 0; }
+
+  /* Menu bar illustration */
+  .desktop {
+    position: relative; width: 100%; height: 246px; border-radius: 16px; overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 100% 110%, rgba(130, 128, 230, 0.55), transparent 55%),
+      radial-gradient(70% 120% at -10% 70%, rgba(110, 100, 210, 0.45), transparent 60%),
+      linear-gradient(160deg, #23244c 0%, #15162e 55%, #1c1d40 100%);
+    font: 590 13px/16px var(--sans); color: #fff;
+  }
+  .desktop .swoosh { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .menubar { position: absolute; top: 10px; right: 20px; display: flex; align-items: center; height: 24px; }
+  .menubar .item { position: relative; display: flex; align-items: center; gap: 4px; padding: 4px 9px; white-space: nowrap; }
+  .menubar .status { position: relative; }
+  .menubar .status .item::before { content: ""; position: absolute; inset: 0; border-radius: 100px; background: rgba(255, 255, 255, 0.14); opacity: 0; transition: opacity 0.12s; }
+  .menubar .status.open .item::before { opacity: 1; }
+  .menubar .status .item > * { position: relative; }
+  .menubar .status img { width: 16px; height: 10px; transition: opacity 0.2s; }
+  .menubar .status.busy img, .menubar .status.busy .title { opacity: 0.5; }
+  .menubar .glyph { display: block; }
+  .menubar .clock { display: flex; gap: 8px; padding-right: 0; }
+
   .menu {
-    margin: 4px 16px 0 auto; width: 250px; padding: 6px;
-    background: var(--menu-bg); color: var(--menu-fg);
-    border-radius: 11px; border: 1px solid var(--menu-line);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
-    font-size: 13.5px; position: relative; right: 0;
+    position: absolute; top: calc(100% + 11px); left: 7px; width: 260px; padding: 5px 12px;
+    background: rgba(38, 38, 40, 0.92); border-radius: 12px;
+    box-shadow: 0 0 0 0.5px rgba(166, 166, 166, 0.6), inset 0 0 0 0.5px rgba(255, 255, 255, 0.08), 0 8px 48px rgba(0, 0, 0, 0.45);
+    font-weight: 510; font-size: 13px; line-height: normal; color: #f5f5f5;
   }
-  .menu .head { font-size: 11px; font-weight: 600; color: var(--menu-muted); padding: 4px 10px 2px; letter-spacing: 0.02em; }
-  .menu .row { display: grid; grid-template-columns: 18px 1fr; padding: 4px 10px 4px 6px; border-radius: 6px; }
-  .menu .row.hover { background: #0a64d6; color: #fff; }
-  .menu .row.hover .sub { color: rgba(255, 255, 255, 0.8); }
-  .menu .tick { font-size: 12px; line-height: 20px; }
-  .menu .sub { grid-column: 2; font-size: 11.5px; color: var(--menu-muted); margin-top: -2px; }
-  .menu hr { border: 0; border-top: 1px solid var(--menu-line); margin: 5px 10px; }
+  .status:not(.open) .menu { display: none; }
+  .menu .row { display: flex; align-items: center; gap: 8px; min-height: 24px; padding-left: 12px; margin: 0 -1px; border-radius: 6px; }
+  .menu .row.hover { background: #2f6fde; color: #fff; }
+  .menu .row.hover small, .menu .row.hover .key { color: rgba(255, 255, 255, 0.75); }
+  .menu .row.tall { min-height: 28px; }
+  .menu .mark { flex: none; width: 4px; position: relative; align-self: stretch; }
+  .menu .mark span { position: absolute; left: -6px; top: 50%; transform: translateY(-50%); width: 12px; font-size: 11px; font-weight: 700; }
+  .menu .label { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .menu .label small { display: block; font-size: 10px; color: #8a8a8d; }
+  .menu .sym { width: 12px; height: 12px; flex: none; }
+  .menu .key { color: #6e6e72; display: flex; gap: 4px; padding-right: 4px; }
+  .menu hr { border: 0; height: 1px; background: rgba(255, 255, 255, 0.1); margin: 5px -1px; }
 
-  section { padding: 8px 0 48px; }
-  h2 { font-size: 28px; letter-spacing: -0.01em; margin: 0 0 18px; }
-  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-  .feature { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
-  .feature h3 { margin: 0 0 6px; font-size: 17px; }
-  .feature p { margin: 0; color: var(--muted); font-size: 15px; }
-
-  ol.steps { padding-left: 22px; margin: 0; }
-  ol.steps li { margin-bottom: 10px; }
-  .note {
-    background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent);
-    border-radius: 10px; padding: 14px 18px; color: var(--muted); font-size: 15px; margin-top: 18px;
+  .cursor {
+    position: absolute; left: 0; top: 0; z-index: 2; width: 16.5px; height: 26px;
+    transform: translate(var(--x, 260px), var(--y, 64px));
+    transition: transform var(--move, 0ms) cubic-bezier(0.45, 0.05, 0.25, 1);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
   }
-  .note strong { color: var(--fg); }
+  .cursor img { display: block; width: 100%; height: 100%; transform-origin: 0 0; transition: transform 0.08s; }
+  .cursor.pressed img { transform: scale(0.86); }
 
-  footer { border-top: 1px solid var(--line); padding: 28px 0 48px; color: var(--muted); font-size: 14px; }
-  footer p { margin: 4px 0; }
+  /* Footer */
+  footer { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 16px 32px; padding: 64px 24px 40px; color: var(--text); }
+  footer p { opacity: 0.8; }
+  footer strong { font-weight: 700; }
+  footer img { width: 40px; height: auto; transform: scaleX(-1); }
+  .disclaimer { text-align: center; font-size: 13px; color: #6f6e6a; padding: 0 24px 40px; }
 
-  @media (max-width: 560px) {
-    header { padding-top: 48px; }
-    header img { width: 112px; height: 112px; }
+  @media (max-width: 900px) {
+    .hero-inner { gap: 48px; }
+    .cols, .why .wrap { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+    .card, .desktop { width: 100%; max-width: 520px; justify-self: center; }
+    .why-copy > .panel { width: calc(100% + 128px); }
+  }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 16px 56px; }
+    .hero-inner { flex-direction: column; gap: 32px; }
+    .art { width: 120px; }
+    .intro { align-items: center; text-align: center; }
+    .details { align-items: center; }
     h1 { font-size: 40px; }
-    .tagline { font-size: 18px; }
-    .menu { margin-right: 8px; }
-    .bar .extra { display: none; }
+    .wrap { padding: 0 16px; }
+    .card { padding: 24px; }
+    .why-copy > .panel { left: -16px; top: -40px; width: calc(100% + 32px); height: calc(100% + 80px); }
+    .menubar { right: 10px; }
+    .menubar .date { display: none; }
+    .menu { width: 212px; padding: 5px 8px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .download, .copy-btn { transition: background-color 0.15s; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <img src="icon.svg" alt="">
-    <h1>Hatstand</h1>
-    <p class="tagline">Switch the Claude desktop app between accounts from your menu bar, without signing out and back in.</p>
-    <a class="download" href="https://github.com/willblackmore/hatstand/releases/latest/download/Hatstand.dmg">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10M5.5 8.5 10 13l4.5-4.5M4 17h12"/></svg>
-      Download for Mac
-    </a>
-    <p class="meta">Free and open source · macOS 14 or later · <a href="https://github.com/willblackmore/hatstand">View on GitHub</a></p>
-  </header>
-
-  <div class="demo" aria-hidden="true">
-    <div class="screen">
-      <div class="bar">
-        <span class="extra">Wi‑Fi</span>
-        <span class="item open">
-          <svg viewBox="162 279 700 437.5"><path fill="currentColor" d="M368.124 307.659L510.994 298.233L648.458 309.894L672.486 334.427L661.802 477.457L653.27 633.815L372.875 634.232L366.476 485.434L352.763 333.786L368.124 307.659Z"/><path fill="currentColor" d="M197.74 633.468L522.548 626.168L827.635 620.874L854.11 646.076L854.11 662.5L836 686.5L818.5 690L511.079 697.227L213.479 697.774L172.5 678L169.967 664.803L197.74 633.468Z"/></svg>
-          Work
-        </span>
-        <span>Sat 7 Nov&nbsp; 21:30</span>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="art" aria-hidden="true"><img src="images/hatstand.svg" alt=""></div>
+    <div class="intro">
+      <div class="copy">
+        <h1>Hatstand</h1>
+        <p class="tagline">Switch the Claude desktop app between accounts from your menu bar, without the faff.</p>
       </div>
-      <div class="menu">
-        <div class="head">Your Instances</div>
-        <div class="row"><span class="tick">✓</span><span>Work</span><span class="sub">Default instance</span></div>
-        <div class="row hover"><span></span><span>Personal</span></div>
-        <div class="row"><span></span><span>Side project</span></div>
-        <hr>
-        <div class="row"><span></span><span>Manage Instances…</span></div>
-        <div class="row"><span></span><span>Quit Hatstand</span></div>
-      </div>
+      <a class="download" href="https://github.com/willblackmore/hatstand/releases/latest/download/Hatstand.dmg">
+        Download for macOS
+        <img src="images/download.svg" alt="">
+      </a>
+      <ul class="details">
+        <li><img src="images/apple.svg" alt="">macOS 14 or later</li>
+        <li><img src="images/heart.svg" alt="">Free &amp; open source</li>
+        <li><img src="images/github.svg" alt=""><a href="https://github.com/willblackmore/hatstand">View on GitHub</a></li>
+        <li><img src="images/pound.svg" alt=""><a href="https://www.paypal.com/paypalme/willblackmore/7.50?locale.x=en_GB&amp;country.x=GB">Buy me a beer</a></li>
+      </ul>
     </div>
   </div>
+</header>
 
-  <section>
-    <h2>What it does</h2>
-    <div class="features">
-      <div class="feature">
-        <h3>Separate instances</h3>
-        <p>Each instance has its own sign-in, chats, settings, MCP servers and Claude Code data. Nothing leaks between them.</p>
-      </div>
-      <div class="feature">
-        <h3>One click to switch</h3>
-        <p>Pick an instance from the menu. Hatstand quits Claude fully, then reopens it as the one you chose.</p>
-      </div>
-      <div class="feature">
-        <h3>Leaves Claude alone</h3>
-        <p>Hatstand never modifies Claude or moves its data. It only launches Claude with the right settings for each instance.</p>
+<main>
+  <section class="install">
+    <div class="wrap">
+      <h2>Installation</h2>
+      <div class="cols">
+        <div>
+          <p class="lede">Until I’m enrolled in the Apple developer programme, this requires a bit of manual effort…</p>
+          <ol class="steps">
+            <li><p>Download <a href="https://github.com/willblackmore/hatstand/releases/latest/download/Hatstand.dmg">Hatstand.dmg</a>, open it and drag Hatstand into Applications.</p></li>
+            <li><p>Open Hatstand. The first time, macOS says it can’t check the app for malicious software. Click Done.</p></li>
+            <li><p>Open System Settings › Privacy &amp; Security, scroll down to the message about Hatstand and click Open Anyway.</p></li>
+            <li><p>Hatstand appears in your menu bar. Open Manage Instances… and click + to add your second account.</p></li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Alternatively…</h3>
+          <p>Put your DIY hat on and <a href="https://github.com/willblackmore/hatstand#building">build it yourself</a> from the source code.</p>
+          <p>Not sure how? Paste the prompt below into Claude and the big guy will give you a hand.</p>
+          <button class="prompt" type="button" aria-label="Copy the prompt for Claude" aria-describedby="prompt">
+            <svg class="icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5v6.5a1.5 1.5 0 0 1-1.5 1.5H8l-3.5 3v-3A1.5 1.5 0 0 1 3 11z"/><path d="M6.5 7.75h5"/></svg>
+            <code id="prompt">Hey Claude, I’d like to build Hatstand, a macOS menu bar app, from its source code: https://github.com/willblackmore/hatstand
+
+Before anything else, ask me these two questions one at a time, using your question UI with clickable options rather than plain text:
+1. Have I used Xcode before? (Never / A little / Lots)
+2. Is Xcode installed on this Mac right now? (Yes / No / Not sure)
+
+If I’ve never used Xcode, give me an in-depth, step-by-step walkthrough: explain what each step does, tell me exactly where to click and what I should see, and check in with me before moving on. If I’ve used it before, keep it quick and to the point. If Xcode isn’t installed, or I’m not sure, start by helping me check and install it.
+
+Then help me download the code, build it and get Hatstand running in my menu bar.</code>
+            <span class="copy-icon" aria-hidden="true">
+              <img src="images/copy.svg" alt="">
+              <svg class="tick" viewBox="0 0 14 14" fill="none" stroke="#faf9f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.5 5.5 10.5 11.5 3.5"/></svg>
+            </span>
+          </button>
+          <p class="copied-note" role="status" aria-live="polite"></p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section>
-    <h2>Install</h2>
-    <ol class="steps">
-      <li><a href="https://github.com/willblackmore/hatstand/releases/latest/download/Hatstand.dmg">Download Hatstand.dmg</a>, open it and drag <strong>Hatstand</strong> into <strong>Applications</strong>.</li>
-      <li>Open Hatstand. The first time, macOS says it can't check the app for malicious software. Click <strong>Done</strong>.</li>
-      <li>Open <strong>System Settings › Privacy &amp; Security</strong>, scroll down to the message about Hatstand and click <strong>Open Anyway</strong>.</li>
-      <li>Hatstand appears in your menu bar. Open <strong>Manage Instances…</strong> and click <strong>+</strong> to add your second account.</li>
-    </ol>
-    <p class="note"><strong>Why the extra step?</strong> Hatstand is a free hobby project and isn't signed with a paid Apple Developer ID, so macOS asks you to confirm you trust it. You only need to do this once. You can also <a href="https://github.com/willblackmore/hatstand#building">build it yourself</a> from the source code.</p>
+  <section class="why">
+    <div class="wrap">
+      <div class="why-copy">
+        <img class="panel" src="images/panel.svg" alt="">
+        <h2>Why Hatstand?</h2>
+        <p>Claude only lets you be signed in to one account at a time. Switching means signing out and back in again, every time.</p>
+        <p>Hatstand keeps each account on its own peg. Pick one from the menu bar and Claude reopens as that account in seconds, with its chats, settings and Claude Code setup just as you left them.</p>
+      </div>
+
+      <div class="desktop" role="img" aria-label="Animation: the pointer opens the Hatstand menu in the menu bar and switches Claude between the Work and Personal instances.">
+        <svg class="swoosh" viewBox="0 0 437 246" preserveAspectRatio="none" fill="none" aria-hidden="true">
+          <path d="M-30 60C40 110 40 200 -10 260" stroke="rgba(170,165,255,0.55)" stroke-width="3"/>
+          <path d="M-45 70C20 120 20 200 -25 260" stroke="rgba(120,115,220,0.35)" stroke-width="10"/>
+          <path d="M270 260C330 230 400 170 450 60" stroke="rgba(200,198,255,0.5)" stroke-width="2"/>
+          <path d="M370 260C410 220 440 170 460 120" stroke="rgba(200,198,255,0.4)" stroke-width="1.5"/>
+        </svg>
+        <div class="menubar" aria-hidden="true">
+          <div class="status open">
+            <span class="item">
+              <img src="images/menubar-hat.svg" alt="">
+              <span class="title">Personal</span>
+            </span>
+            <div class="menu">
+              <div class="row tall hover" data-instance="Work"><span class="mark"><span></span></span><span class="label"><span>Work<small>Default instance</small></span></span></div>
+              <div class="row" data-instance="Personal"><span class="mark"><span>✓</span></span><span class="label">Personal</span></div>
+              <hr>
+              <div class="row"><span class="mark"></span><span class="label">
+                <svg class="sym" viewBox="0 0 12 12" fill="currentColor"><rect x="1" y="1" width="4.4" height="4.4" rx="1"/><rect x="6.6" y="1" width="4.4" height="4.4" rx="1"/><rect x="1" y="6.6" width="4.4" height="4.4" rx="1"/><rect x="6.6" y="6.6" width="4.4" height="4.4" rx="1"/></svg>
+                Manage Instances…</span></div>
+              <div class="row"><span class="mark"></span><span class="label">
+                <svg class="sym" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="6" cy="6" r="1.8"/><path d="M6 .9v1.6M6 9.5v1.6M.9 6h1.6M9.5 6h1.6M2.4 2.4l1.1 1.1M8.5 8.5l1.1 1.1M2.4 9.6l1.1-1.1M8.5 3.5l1.1-1.1"/><circle cx="6" cy="6" r="3.6"/></svg>
+                Settings…</span><span class="key">⌘ ,</span></div>
+              <hr>
+              <div class="row"><span class="mark"></span><span class="label">Quit Hatstand</span><span class="key">⌘Q</span></div>
+            </div>
+          </div>
+          <img class="glyph" src="images/menubar-wifi.svg" width="34.5" height="20" alt="">
+          <span class="item"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><circle cx="6" cy="6" r="4.3"/><path d="m9.2 9.2 3.3 3.3"/></svg></span>
+          <img class="glyph" src="images/menubar-control-centre.svg" width="31" height="21" alt="">
+          <span class="item clock"><span class="date">Wed 11 Jun</span><span>09:41</span></span>
+        </div>
+        <div class="cursor" aria-hidden="true"><img src="images/cursor.svg" alt=""></div>
+      </div>
+    </div>
   </section>
+</main>
 
-  <footer>
-    <p>Hatstand is an unofficial, independent project. It isn't made by or affiliated with Anthropic.</p>
-    <p>Released under the <a href="https://github.com/willblackmore/hatstand/blob/main/LICENSE">MIT licence</a>.</p>
-  </footer>
+<footer>
+  <p>Made by <a href="https://willblackmore.co.uk"><strong>Will</strong></a></p>
+  <img src="images/footer-hat.svg" alt="">
+  <p>© 2026 Will Blackmore</p>
+</footer>
+<p class="disclaimer">Hatstand is an unofficial, independent project. It isn’t made by or affiliated with Anthropic. Released under the <a href="https://github.com/willblackmore/hatstand/blob/main/LICENSE">MIT licence</a>.</p>
 
-</div>
+<script>
+  // Copy the build prompt
+  (() => {
+    const button = document.querySelector('.prompt');
+    const prompt = document.getElementById('prompt');
+    const note = document.querySelector('.copied-note');
+    let timer;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(prompt.textContent.trim());
+        button.classList.add('done');
+        note.textContent = 'Prompt copied';
+        clearTimeout(timer);
+        timer = setTimeout(() => { button.classList.remove('done'); note.textContent = ''; }, 2000);
+      } catch (error) {
+        // Clipboard blocked: select the text so it can be copied by hand
+        const range = document.createRange();
+        range.selectNodeContents(prompt);
+        getSelection().removeAllRanges();
+        getSelection().addRange(range);
+      }
+    });
+  })();
+
+  // Menu bar demo: a pointer switches between the two instances on a loop,
+  // with the same "Switching…" title and timing as the real app
+  (() => {
+    const desktop = document.querySelector('.desktop');
+    const status = desktop.querySelector('.status');
+    const item = status.querySelector('.item');
+    const title = status.querySelector('.title');
+    const rows = [...desktop.querySelectorAll('[data-instance]')];
+    const cursor = desktop.querySelector('.cursor');
+
+    let running = 'Personal';
+    let switchingTo = null;
+
+    function render() {
+      title.textContent = switchingTo ? 'Switching…' : running;
+      status.classList.toggle('busy', !!switchingTo);
+      for (const row of rows) {
+        const name = row.dataset.instance;
+        row.querySelector('.mark span').textContent = name === switchingTo ? '–' : (!switchingTo && name === running ? '✓' : '');
+      }
+    }
+
+    function pointAt(el, fx, fy) {
+      const d = desktop.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      return [r.left - d.left + r.width * fx, r.top - d.top + r.height * fy];
+    }
+
+    function place([x, y], ms) {
+      cursor.style.setProperty('--move', `${ms}ms`);
+      cursor.style.setProperty('--x', `${x}px`);
+      cursor.style.setProperty('--y', `${y}px`);
+    }
+
+    const restingPoint = () => [desktop.clientWidth * 0.46, desktop.clientHeight * 0.74];
+
+    render();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // Leave the menu open with the pointer over Work, as a still picture
+      place(pointAt(rows[0], 0.42, 0.55), 0);
+      return;
+    }
+
+    // Only animate while the demo is on screen
+    let visible = false;
+    let wake = null;
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible && wake) { wake(); wake = null; }
+    }).observe(desktop);
+    const untilVisible = () => visible ? Promise.resolve() : new Promise((resolve) => { wake = resolve; });
+    const pause = async (ms) => { await new Promise((resolve) => setTimeout(resolve, ms)); await untilVisible(); };
+
+    async function moveTo(el, fx, fy, ms) {
+      place(pointAt(el, fx, fy), ms);
+      await pause(ms);
+    }
+
+    async function click() {
+      cursor.classList.add('pressed');
+      await pause(110);
+      cursor.classList.remove('pressed');
+    }
+
+    status.classList.remove('open');
+    rows[0].classList.remove('hover');
+    place(restingPoint(), 0);
+
+    (async () => {
+      await untilVisible();
+      await pause(700);
+      for (;;) {
+        const target = running === 'Personal' ? 'Work' : 'Personal';
+        const row = rows.find((r) => r.dataset.instance === target);
+
+        await moveTo(item, 0.5, 0.6, 900);
+        await pause(250);
+        await click();
+        status.classList.add('open');
+        await pause(500);
+
+        await moveTo(row, 0.42, 0.55, 650);
+        row.classList.add('hover');
+        await pause(450);
+        await click();
+        row.classList.remove('hover');
+        status.classList.remove('open');
+
+        // Claude quits, then reopens as the chosen instance
+        switchingTo = target;
+        render();
+        place(restingPoint(), 1200);
+        await pause(2800);
+        running = target;
+        switchingTo = null;
+        render();
+        await pause(2200);
+      }
+    })();
+  })();
+</script>
 </body>
 </html>
