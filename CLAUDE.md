@@ -67,8 +67,6 @@ Store the instance list and settings as JSON at:
 
 `~/Library/Application Support/Hatstand/config.json`
 
-The app used to be called CSwitcher. On launch, if there's no config at the new path but there is one at `~/Library/Application Support/CSwitcher/config.json`, copy it across (copy, don't move). Never move instance folders that were created under the old `CSwitcher/Instances` folder: the config stores their full paths, so they keep working where they are.
-
 Write atomically. Standardise all paths (resolve `~`, symlinks, trailing slashes) before saving or comparing.
 
 ---

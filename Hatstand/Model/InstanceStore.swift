@@ -35,36 +35,6 @@ final class InstanceStore: ObservableObject {
             .appendingPathComponent("Library/Application Support/Hatstand/config.json")
     }
 
-    /// Where the app saved its config when it was called CSwitcher.
-    nonisolated static var legacyConfigURL: URL {
-        FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/Application Support/CSwitcher/config.json")
-    }
-
-    /// Copies a config saved under the app's old name to the new location, once.
-    ///
-    /// Only `config.json` is copied. The old file is left in place, and instance
-    /// folders are never moved: the config records their full paths, so instances
-    /// created under the old `CSwitcher/Instances` folder keep working from there.
-    /// Returns true if a copy was made.
-    @discardableResult
-    nonisolated static func copyLegacyConfigIfNeeded(from legacy: URL = legacyConfigURL,
-                                                     to url: URL = defaultConfigURL) -> Bool {
-        let fm = FileManager.default
-        guard !fm.fileExists(atPath: url.path), fm.fileExists(atPath: legacy.path) else { return false }
-        do {
-            try fm.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try fm.copyItem(at: legacy, to: url)
-            Logger(subsystem: "Hatstand", category: "InstanceStore")
-                .info("Copied config from \(legacy.path, privacy: .public)")
-            return true
-        } catch {
-            Logger(subsystem: "Hatstand", category: "InstanceStore")
-                .error("Couldn’t copy old config: \(error.localizedDescription, privacy: .public)")
-            return false
-        }
-    }
-
     init(configURL: URL = InstanceStore.defaultConfigURL,
          locations: ClaudeDefaultLocations = ClaudeDefaultLocations()) {
         self.configURL = configURL

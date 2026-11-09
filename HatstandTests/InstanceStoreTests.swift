@@ -76,30 +76,6 @@ struct InstanceStoreTests {
         #expect(files.contains { $0.hasPrefix("config-unreadable-") })
     }
 
-    @Test func copiesLegacyConfigOnceAndKeepsTheOriginal() throws {
-        let temp = try TemporaryFolder()
-        let legacyFolder = try temp.makeFolder("CSwitcher")
-        let legacy = URL(fileURLWithPath: legacyFolder + "/config.json")
-        let current = URL(fileURLWithPath: temp.path + "/Hatstand/config.json")
-        try Data(#"{ "defaultInstanceName": "Work", "instances": [] }"#.utf8).write(to: legacy)
-
-        #expect(InstanceStore.copyLegacyConfigIfNeeded(from: legacy, to: current))
-        #expect(FileManager.default.fileExists(atPath: legacy.path))
-        #expect(InstanceStore.load(from: current).defaultInstanceName == "Work")
-
-        // Never overwrites a config that already exists at the new location.
-        try Data(#"{ "defaultInstanceName": "Changed", "instances": [] }"#.utf8).write(to: current)
-        #expect(!InstanceStore.copyLegacyConfigIfNeeded(from: legacy, to: current))
-        #expect(InstanceStore.load(from: current).defaultInstanceName == "Changed")
-    }
-
-    @Test func doesNothingWithoutLegacyConfig() throws {
-        let temp = try TemporaryFolder()
-        let current = URL(fileURLWithPath: temp.path + "/Hatstand/config.json")
-        #expect(!InstanceStore.copyLegacyConfigIfNeeded(from: URL(fileURLWithPath: temp.path + "/none.json"), to: current))
-        #expect(!FileManager.default.fileExists(atPath: current.path))
-    }
-
     @Test func toleratesMissingKeys() throws {
         let json = #"{ "defaultInstanceName": "Work", "instances": [] }"#
         let config = try JSONDecoder().decode(AppConfig.self, from: Data(json.utf8))

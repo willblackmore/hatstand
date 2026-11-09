@@ -26,7 +26,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.mainMenu = makeMainMenu()
 
-        InstanceStore.copyLegacyConfigIfNeeded()
         let store = InstanceStore()
         let controller = ClaudeController(store: store)
         let updates = UpdateChecker(store: store)
