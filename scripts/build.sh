@@ -1,26 +1,30 @@
 #!/bin/zsh
-# Builds Hatstand.app with just the Command Line Tools, for people who don't
-# have Xcode. Install them with `xcode-select --install`.
+# Builds Hatstand.app. Needs only Apple's Command Line Tools
+# (`xcode-select --install`); Xcode works too but isn't required.
 #
 # Usage:
-#   scripts/build-without-xcode.sh           build build/swiftpm/Hatstand.app
-#   scripts/build-without-xcode.sh --test    run the unit tests instead
+#   scripts/build.sh           build build/Hatstand.app (universal, Release)
+#   scripts/build.sh --test    run the unit tests instead
 #
-# What Xcode normally does, done by hand:
-#   - compile: `swift build`, using Package.swift (same sources as the project)
-#   - Info.plist: written below, with the version read from the Xcode project
-#   - icons: asset catalogues need actool, which only ships with Xcode, so the
-#     menu bar SVG is copied in as-is (NSImage reads SVG) and the app icon PNGs
-#     are turned into AppIcon.icns with iconutil
-#   - signing: ad hoc with hardened runtime, like "Sign to Run Locally"
+# `swift build` compiles the code from Package.swift but doesn't make app
+# bundles, so this script puts Hatstand.app together itself:
+#   - Info.plist: written below
+#   - icons: the menu bar SVG is copied in as-is (NSImage reads SVG) and the
+#     app icon PNGs in design/AppIcon.iconset become AppIcon.icns
+#   - signing: ad hoc, with hardened runtime
 
 set -euo pipefail
 
+# The release tag must be "v" plus VERSION (for example v1.1): the update
+# check compares the two. Bump BUILD_NUMBER with every release too.
+VERSION=1.1
+BUILD_NUMBER=2
+BUNDLE_ID=io.github.willblackmore.Hatstand
+
 ROOT=${0:A:h:h}
-SCRATCH="$ROOT/build/swiftpm"
+SCRATCH="$ROOT/build"
 APP="$SCRATCH/Hatstand.app"
-ASSETS="$ROOT/Hatstand/Assets.xcassets"
-PBXPROJ="$ROOT/Hatstand.xcodeproj/project.pbxproj"
+DESIGN="$ROOT/design"
 
 cd "$ROOT"
 
@@ -42,12 +46,6 @@ fi
 if [[ ${1:-} == --test ]]; then
     exec swift test --scratch-path "$SCRATCH" "${swift_flags[@]}"
 fi
-
-# One source of truth for the version: the Xcode project.
-setting() { grep -m1 "$1 = " "$PBXPROJ" | sed -E 's/.*= "?([^";]*)"?;/\1/'; }
-VERSION=$(setting MARKETING_VERSION)
-BUILD_NUMBER=$(setting CURRENT_PROJECT_VERSION)
-BUNDLE_ID=$(setting PRODUCT_BUNDLE_IDENTIFIER)
 
 echo "→ Compiling Hatstand $VERSION ($BUILD_NUMBER)…"
 # Built once per architecture and joined with lipo: `swift build` with two
@@ -89,11 +87,8 @@ cat > "$APP/Contents/Info.plist" <<EOF
 EOF
 plutil -lint -s "$APP/Contents/Info.plist"
 
-cp "$ASSETS/MenuBarIcon.imageset/MenuBarIcon.svg" "$APP/Contents/Resources/"
-ICONSET="$SCRATCH/AppIcon.iconset"
-rm -rf "$ICONSET" && mkdir -p "$ICONSET"
-cp "$ASSETS"/AppIcon.appiconset/icon_*.png "$ICONSET/"
-iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
+cp "$DESIGN/menubar-icon.svg" "$APP/Contents/Resources/MenuBarIcon.svg"
+iconutil -c icns "$DESIGN/AppIcon.iconset" -o "$APP/Contents/Resources/AppIcon.icns"
 
 echo "→ Signing…"
 codesign --force --sign - --options runtime "$APP"

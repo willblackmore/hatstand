@@ -386,13 +386,11 @@
             <svg class="icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5v6.5a1.5 1.5 0 0 1-1.5 1.5H8l-3.5 3v-3A1.5 1.5 0 0 1 3 11z"/><path d="M6.5 7.75h5"/></svg>
             <code id="prompt">Hey Claude, I’d like to build Hatstand, a macOS menu bar app, from its source code: https://github.com/willblackmore/hatstand
 
-Before anything else, ask me these two questions one at a time, using your question UI with clickable options rather than plain text:
-1. Have I used Xcode before? (Never / A little / Lots)
-2. Is Xcode installed on this Mac right now? (Yes / No / Not sure)
+Before anything else, ask me whether I’ve used Terminal before (Never / A little / Lots), using your question UI with clickable options rather than plain text.
 
-If I’ve never used Xcode, give me an in-depth, step-by-step walkthrough: explain what each step does, tell me exactly where to click and what I should see, and check in with me before moving on. If I’ve used it before, keep it quick and to the point. If Xcode isn’t installed, or I’m not sure, start by helping me check and install it.
+If I’ve never used Terminal, give me an in-depth, step-by-step walkthrough: explain what each command does, tell me what I should see, and check in with me before moving on. If I’ve used it before, keep it quick and to the point.
 
-Then help me download the code, build it and get Hatstand running in my menu bar.</code>
+Hatstand builds with Apple’s free Command Line Tools, so I don’t need Xcode. Start by checking whether they’re installed and help me install them if not. Then help me download the code, build it with scripts/build.sh and get Hatstand running in my menu bar.</code>
             <span class="copy-icon" aria-hidden="true">
               <img src="images/copy.svg" alt="">
               <svg class="tick" viewBox="0 0 14 14" fill="none" stroke="#faf9f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.5 5.5 10.5 11.5 3.5"/></svg>

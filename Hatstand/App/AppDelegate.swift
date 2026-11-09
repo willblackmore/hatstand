@@ -23,15 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusMenu: StatusMenuController?
     private var updates: UpdateChecker?
 
-    /// Unit tests are hosted in the app; don't put up a menu bar item for them.
-    private var isRunningTests: Bool {
-        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-            || NSClassFromString("XCTestCase") != nil
-    }
-
     func applicationDidFinishLaunching(_ notification: Notification) {
-        guard !isRunningTests else { return }
-
         NSApp.mainMenu = makeMainMenu()
 
         InstanceStore.copyLegacyConfigIfNeeded()

@@ -46,40 +46,27 @@ Hatstand's own settings are saved in `~/Library/Application Support/Hatstand/con
 
 ## Building
 
-You need Xcode 16 or later (developed with Xcode 27). Hatstand runs on macOS 14 Sonoma or later.
-
-1. Clone the repository and open `Hatstand.xcodeproj`.
-2. Choose **Product › Run**.
-
-Or build from the command line:
+You need Apple's free Command Line Tools. You don't need Xcode, though it works too if you have it. To install the tools, run:
 
 ```bash
-xcodebuild -project Hatstand.xcodeproj -scheme Hatstand -configuration Release -derivedDataPath build build
+xcode-select --install
 ```
 
-The app is at `build/Build/Products/Release/Hatstand.app`. Move it to `/Applications`.
+Then clone the repository and build Hatstand:
+
+```bash
+scripts/build.sh
+```
+
+The app is at `build/Hatstand.app`. Move it to `/Applications`. Hatstand runs on macOS 14 Sonoma or later.
 
 Run the unit tests with:
 
 ```bash
-xcodebuild -project Hatstand.xcodeproj -scheme Hatstand -derivedDataPath build test
+scripts/build.sh --test
 ```
 
-### Without Xcode
-
-If you'd rather not install Xcode, Apple's free Command Line Tools are enough. They're a smaller install and don't need the App Store: run `xcode-select --install`. Then build with:
-
-```bash
-scripts/build-without-xcode.sh
-```
-
-The app is at `build/swiftpm/Hatstand.app`. Run the unit tests with:
-
-```bash
-scripts/build-without-xcode.sh --test
-```
-
-The script compiles the same sources using `Package.swift`, then puts the app bundle together itself: it writes the `Info.plist`, copies in the icons and signs the app ad hoc. The only difference from the Xcode build is that the icons are plain files rather than a compiled asset catalogue, which needs Xcode.
+`swift build` compiles the code but doesn't make Mac apps, so the script puts `Hatstand.app` together itself: it writes the `Info.plist`, copies in the icons from `design/` and signs the app ad hoc.
 
 ### Releases
 
@@ -89,11 +76,11 @@ To make the downloadable disk image, run:
 scripts/make-release.sh
 ```
 
-It builds a universal Release copy and saves it as `dist/Hatstand.dmg`. Upload that file to a GitHub release tagged with the version number, for example `v1.0`. Set the version (`MARKETING_VERSION`) in Xcode first: the tag must match it, because that's how Hatstand's update check spots a new release. Keep the file name as `Hatstand.dmg` so the download link always gets the latest version.
+It builds a universal copy and saves it as `dist/Hatstand.dmg`. Upload that file to a GitHub release tagged with the version number, for example `v1.0`. Set `VERSION` (and bump `BUILD_NUMBER`) at the top of `scripts/build.sh` first: the tag must match `VERSION`, because that's how Hatstand's update check spots a new release. Keep the file name as `Hatstand.dmg` so the download link always gets the latest version.
 
 The app is signed to run locally only (ad hoc). It isn't signed with a Developer ID or notarised.
 
-If you'd like to use your own bundle identifier, change `PRODUCT_BUNDLE_IDENTIFIER` in the project's build settings.
+If you'd like to use your own bundle identifier, change `BUNDLE_ID` at the top of `scripts/build.sh`.
 
 ## Tips
 

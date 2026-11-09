@@ -10,18 +10,15 @@
 set -euo pipefail
 
 ROOT=${0:A:h:h}
-BUILD="$ROOT/build/release"
+BUILD="$ROOT/build"
 DIST="$ROOT/dist"
 STAGE="$BUILD/dmg"
-APP="$BUILD/Build/Products/Release/Hatstand.app"
+APP="$BUILD/Hatstand.app"
 DMG="$DIST/Hatstand.dmg"
 
 cd "$ROOT"
 
-echo "→ Building Release…"
-xcodebuild -project Hatstand.xcodeproj -scheme Hatstand -configuration Release \
-    -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO \
-    -derivedDataPath "$BUILD" clean build -quiet
+scripts/build.sh
 
 codesign --verify --deep --strict "$APP"
 # Universal, so it runs on both Apple silicon and Intel Macs.

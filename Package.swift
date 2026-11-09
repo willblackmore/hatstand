@@ -1,13 +1,7 @@
 // swift-tools-version:5.9
 //
-// Lets Hatstand be built and tested with just the Command Line Tools, no Xcode:
-//
-//     swift test                          run the unit tests
-//     scripts/build-without-xcode.sh      build Hatstand.app
-//
-// Hatstand.xcodeproj is still the main way to work on the app. This file only
-// describes the same sources; the .app bundle itself is put together by the
-// script, because SwiftPM doesn't make app bundles.
+// Build Hatstand with scripts/build.sh, which compiles this package and then
+// puts Hatstand.app together around it. Run the tests with `scripts/build.sh --test`.
 
 import PackageDescription
 
@@ -17,10 +11,7 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "Hatstand",
-            path: "Hatstand",
-            // Asset catalogues need actool, which only comes with Xcode.
-            // The build script copies the icons into the bundle instead.
-            exclude: ["Assets.xcassets"]
+            path: "Hatstand"
         ),
         .testTarget(
             name: "HatstandTests",

@@ -116,7 +116,7 @@ Write atomically. Standardise all paths (resolve `~`, symlinks, trailing slashes
 - `UpdateChecker` asks GitHub's API for the latest release (`repos/willblackmore/hatstand/releases/latest`) about 10 seconds after launch and then once a day, if "Check for updates automatically" is on (default: on).
 - It compares the release tag (`v1.1`) with `CFBundleShortVersionString` numerically. If newer, the menu shows "Update Available: Hatstand 1.1…", which offers to open the release page.
 - It never downloads or installs anything itself. "Check for Updates…" in the menu and **Check Now** in Settings check straight away and always report the result.
-- Release tags must match the app's version (`MARKETING_VERSION`), with a leading `v`.
+- Release tags must match the app's version (`VERSION` in `scripts/build.sh`), with a leading `v`.
 
 ---
 
@@ -185,14 +185,15 @@ Either a tab in the Manage window or a standard Settings window:
 
 - Swift, SwiftUI for windows, AppKit for the status item and menu.
 - Minimum macOS 14. Developed and tested on macOS 27.
-- `LSUIElement = YES` (no Dock icon).
+- `LSUIElement = YES` (no Dock icon), set in the `Info.plist` that `scripts/build.sh` writes.
 - App Sandbox **off** (needs to launch Claude with arguments, read other processes' arguments, and use user-chosen folders freely).
-- Signing for development: "Sign to Run Locally".
+- Signing: ad hoc (`codesign --sign -`) with hardened runtime, done by `scripts/build.sh`.
 - Keep it small and dependency-free (no third-party packages).
 - Structure suggestion: `InstanceStore` (model + persistence), `ClaudeController` (find, detect, launch, quit, switch), `StatusMenuController` (NSStatusItem/NSMenu), SwiftUI views for Manage, Add and Settings.
 - Unit-test the pure logic: path standardisation and validation, argument parsing, instance matching.
-- Build from the command line with `xcodebuild` to check for errors.
-- It must also build with just the Command Line Tools: `Package.swift` plus `scripts/build-without-xcode.sh` (which writes the `Info.plist` and copies the icons in itself). If you change Info.plist keys, assets or the bundle ID in the Xcode project, update the script to match. Check with `DEVELOPER_DIR=/Library/Developer/CommandLineTools scripts/build-without-xcode.sh` (and `--test`).
+- No Xcode project: it must build with just Apple's Command Line Tools. `Package.swift` compiles the code; `scripts/build.sh` builds it, writes the `Info.plist`, copies the icons in from `design/` and signs the app. Version, build number and bundle ID live at the top of that script.
+- Check for errors with `scripts/build.sh`, and run the tests with `scripts/build.sh --test`. To be sure it works without Xcode, prefix either with `DEVELOPER_DIR=/Library/Developer/CommandLineTools`.
+- There's no asset catalogue (that needs Xcode's `actool`), so `NSImage(named:)` finds the icons as plain files in the app's `Resources`.
 
 ---
 
@@ -200,11 +201,11 @@ Either a tab in the Manage window or a standard Settings window:
 
 ### Menu bar icon
 
-A solid top hat: `design/menubar-icon.svg`, copied to `Hatstand/Assets.xcassets/MenuBarIcon.imageset/MenuBarIcon.svg`. It's a **template image** (Render As: Template Image, Preserve Vector Data), so the fill colour is ignored and it adapts to light and dark menu bars. Keep the crown and brim as one solid shape: splitting them stops it reading as a hat.
+A solid top hat: `design/menubar-icon.svg`, copied into the app as `MenuBarIcon.svg` by the build script. It's used as a **template image** (the code sets `isTemplate`), so the fill colour is ignored and it adapts to light and dark menu bars. Keep the crown and brim as one solid shape: splitting them stops it reading as a hat.
 
 ### App icon
 
-An angular top hat (orange `#D97757`, cream band `#FAF9F5`, on `#131313`): `design/app-icon.svg`. The PNG sizes in `AppIcon.appiconset` are exported from it. If the SVG changes, re-export every size with transparent corners and keep the drop shadow. Don't use Anthropic's or Claude's logo anywhere in the repo.
+An angular top hat (orange `#D97757`, cream band `#FAF9F5`, on `#131313`): `design/app-icon.svg`. The PNG sizes in `design/AppIcon.iconset` are exported from it, and the build script turns them into `AppIcon.icns`. If the SVG changes, re-export every size with transparent corners and keep the drop shadow. Don't use Anthropic's or Claude's logo anywhere in the repo.
 
 ---
 
