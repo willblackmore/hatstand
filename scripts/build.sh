@@ -17,8 +17,8 @@ set -euo pipefail
 
 # The release tag must be "v" plus VERSION (for example v1.1): the update
 # check compares the two. Bump BUILD_NUMBER with every release too.
-VERSION=1.1
-BUILD_NUMBER=2
+VERSION=1.2
+BUILD_NUMBER=3
 BUNDLE_ID=io.github.willblackmore.Hatstand
 
 ROOT=${0:A:h:h}
