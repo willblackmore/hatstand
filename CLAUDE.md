@@ -192,6 +192,7 @@ Either a tab in the Manage window or a standard Settings window:
 - Structure suggestion: `InstanceStore` (model + persistence), `ClaudeController` (find, detect, launch, quit, switch), `StatusMenuController` (NSStatusItem/NSMenu), SwiftUI views for Manage, Add and Settings.
 - Unit-test the pure logic: path standardisation and validation, argument parsing, instance matching.
 - Build from the command line with `xcodebuild` to check for errors.
+- It must also build with just the Command Line Tools: `Package.swift` plus `scripts/build-without-xcode.sh` (which writes the `Info.plist` and copies the icons in itself). If you change Info.plist keys, assets or the bundle ID in the Xcode project, update the script to match. Check with `DEVELOPER_DIR=/Library/Developer/CommandLineTools scripts/build-without-xcode.sh` (and `--test`).
 
 ---
 

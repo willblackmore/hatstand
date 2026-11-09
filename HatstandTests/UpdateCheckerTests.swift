@@ -103,7 +103,7 @@ struct UpdateCheckerTests {
             configURL: URL(fileURLWithPath: temp.path + "/config.json"),
             locations: ClaudeDefaultLocations(homeDirectory: temp.path + "/home")
         )
-        return UpdateChecker(store: store, session: URLSession(configuration: config))
+        return UpdateChecker(store: store, session: URLSession(configuration: config), currentVersion: AppVersion("1.0")!)
     }
 
     @Test func findsANewerRelease() async throws {

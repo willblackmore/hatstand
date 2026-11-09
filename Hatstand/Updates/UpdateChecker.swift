@@ -78,11 +78,13 @@ final class UpdateChecker: ObservableObject {
     private var timer: Timer?
     private let logger = Logger(subsystem: "Hatstand", category: "UpdateChecker")
 
-    init(store: InstanceStore, session: URLSession = .shared, bundle: Bundle = .main) {
+    /// `currentVersion` is for tests, which may not run inside the app bundle
+    /// (for example under `swift test`); normally it's read from `bundle`.
+    init(store: InstanceStore, session: URLSession = .shared, bundle: Bundle = .main, currentVersion: AppVersion? = nil) {
         self.store = store
         self.session = session
         let short = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-        self.currentVersion = short.flatMap(AppVersion.init) ?? AppVersion("0")!
+        self.currentVersion = currentVersion ?? short.flatMap(AppVersion.init) ?? AppVersion("0")!
     }
 
     /// Checks shortly after launch and then once a day, if the setting is on.

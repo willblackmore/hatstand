@@ -65,6 +65,24 @@ Run the unit tests with:
 xcodebuild -project Hatstand.xcodeproj -scheme Hatstand -derivedDataPath build test
 ```
 
+### Without Xcode
+
+If you'd rather not install Xcode, Apple's free Command Line Tools are enough. They're a smaller install and don't need the App Store: run `xcode-select --install`. Then build with:
+
+```bash
+scripts/build-without-xcode.sh
+```
+
+The app is at `build/swiftpm/Hatstand.app`. Run the unit tests with:
+
+```bash
+scripts/build-without-xcode.sh --test
+```
+
+The script compiles the same sources using `Package.swift`, then puts the app bundle together itself: it writes the `Info.plist`, copies in the icons and signs the app ad hoc. The only difference from the Xcode build is that the icons are plain files rather than a compiled asset catalogue, which needs Xcode.
+
+### Releases
+
 To make the downloadable disk image, run:
 
 ```bash
